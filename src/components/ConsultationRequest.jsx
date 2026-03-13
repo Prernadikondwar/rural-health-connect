@@ -42,8 +42,10 @@ const ConsultationRequest = ({ authUser, onSubmit }) => {
       patientId: authUser?.id || 'unknown',
       submittedAt: new Date().toISOString(),
       status: 'pending',
-      doctorResponse: null
+      doctorResponse: null,
+      type: formData.type || 'routine'
     };
+
 
     // Save to localStorage
     const existingRequests = JSON.parse(localStorage.getItem('consultationRequests') || '[]');

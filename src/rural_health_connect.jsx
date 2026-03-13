@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { User, Activity, Pill, Video, LayoutDashboard, ClipboardList, LogIn, Bell, Hospital, Brain, MessageSquare } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { User, Activity, Pill, Video, LayoutDashboard, ClipboardList, LogIn, Bell, Hospital, Brain, MessageSquare, Globe } from 'lucide-react';
+import { LanguageContext } from './App';
 import AISymptomPredictor from './components/AISymptomPredictor';
 import MedicineAvailability from './components/MedicineAvailability';
 import VideoCall from './components/VideoCall';
 import ConsultationRequest from './components/ConsultationRequest';
+import img1 from './assets/img1.png';
+import img2 from './assets/img2.png';
+import img3 from './assets/img3.png';
 import './rural_health_connect.css';
 
 const RuralHealthConnect = ({ authUser }) => {
+  const { lang, t, toggleLang } = useContext(LanguageContext);
   const [activeTab, setActiveTab] = useState('welcome');
   const [currentPatient, setCurrentPatient] = useState(null);
   const [healthData, setHealthData] = useState(null);
@@ -19,6 +24,23 @@ const RuralHealthConnect = ({ authUser }) => {
     }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [videoRequest, setVideoRequest] = useState(null);
+
+  // Poll for video request status
+  useEffect(() => {
+    if (activeTab === 'consultation' && videoRequest && videoRequest.status === 'pending') {
+      const interval = setInterval(() => {
+        const allRequests = JSON.parse(localStorage.getItem('consultationRequests') || '[]');
+        const updatedReq = allRequests.find(req => req.id === videoRequest.id);
+        if (updatedReq && updatedReq.status === 'accepted') {
+          setVideoRequest(updatedReq);
+          setConsultationActive(true);
+          clearInterval(interval);
+        }
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, videoRequest]);
 
   // Load patient profile from authUser when component mounts
   useEffect(() => {
@@ -79,30 +101,49 @@ const RuralHealthConnect = ({ authUser }) => {
     setActiveTab('dashboard');
   };
 
+  const AccessRestricted = ({ featureName }) => (
+    <div className="glass-card" style={{ padding: '60px 40px', textAlign: 'center' }}>
+      <User size={60} color="var(--primary)" style={{ margin: '0 auto 20px', opacity: 0.5 }} />
+      <h2 style={{ marginBottom: '16px' }}>{t.restricted.title}</h2>
+      <p style={{ opacity: 0.7, maxWidth: '500px', margin: '0 auto 30px' }}>
+        {t.restricted.desc.replace('{feature}', featureName)}
+      </p>
+      <button 
+        onClick={() => showTab('register')}
+        style={{ padding: '14px 40px', background: 'linear-gradient(135deg, #10b981, #06b6d4)', fontWeight: '600' }}
+      >
+        {t.restricted.btn}
+      </button>
+    </div>
+  );
+
   const WelcomeTab = () => (
     <div className="welcome-section glass-card" style={{ padding: '60px 40px', textAlign: 'center' }}>
       <h1 style={{ fontSize: '3rem', marginBottom: '20px', background: 'linear-gradient(to right, #fff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-        Rural Health Connect
+        {t.title}
       </h1>
       <p style={{ fontSize: '1.2rem', color: '#94a3b8', maxWidth: '700px', margin: '0 auto 40px' }}>
-        Empowering rural healthcare with AI-driven diagnostics, seamless teleconsultations, and real-time medicine availability tracking.
+        {t.tagline}
       </p>
       
       <div className="feature-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <div className="feature-card glass-card" style={{ padding: '30px' }}>
-          <Activity size={40} color="var(--primary)" style={{ marginBottom: '20px' }} />
-          <h3>AI Diagnosis</h3>
-          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Advanced symptom analysis to identify health risks early.</p>
+        <div className="feature-card glass-card" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src={img1} alt="AI Diagnosis" style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '12px', marginBottom: '20px' }} />
+          <Activity size={24} color="var(--primary)" style={{ marginBottom: '10px' }} />
+          <h3>{t.dashboard.aiHealthCheck}</h3>
+          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{t.dashboard.aiDesc}</p>
         </div>
-        <div className="feature-card glass-card" style={{ padding: '30px' }}>
-          <Video size={40} color="var(--primary)" style={{ marginBottom: '20px' }} />
-          <h3>Video Consultation</h3>
-          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Face-to-face interaction with doctors from anywhere.</p>
+        <div className="feature-card glass-card" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src={img2} alt="Video Consultation" style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '12px', marginBottom: '20px' }} />
+          <Video size={24} color="var(--primary)" style={{ marginBottom: '10px' }} />
+          <h3>{t.dashboard.telemedicine}</h3>
+          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{t.dashboard.teleDesc}</p>
         </div>
-        <div className="feature-card glass-card" style={{ padding: '30px' }}>
-          <Pill size={40} color="var(--primary)" style={{ marginBottom: '20px' }} />
-          <h3>Medicine Tracker</h3>
-          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>Live updates on medicine stock in your local PHC.</p>
+        <div className="feature-card glass-card" style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <img src={img3} alt="Medicine Tracker" style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '12px', marginBottom: '20px' }} />
+          <Pill size={24} color="var(--primary)" style={{ marginBottom: '10px' }} />
+          <h3>{t.nav.medicines}</h3>
+          <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>{t.tagline.split('.')[1] || 'Live updates on medicine stock.'}</p>
         </div>
       </div>
       
@@ -120,7 +161,7 @@ const RuralHealthConnect = ({ authUser }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Hospital color="var(--primary)" size={32} />
           <div>
-            <h1 style={{ fontSize: '1.5rem', margin: 0 }}>RHC Dashboard</h1>
+            <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Sehatsetu Dashboard</h1>
             <p style={{ fontSize: '0.8rem', opacity: 0.5, margin: 0 }}>Village Health Portal</p>
           </div>
         </div>
@@ -202,25 +243,25 @@ const RuralHealthConnect = ({ authUser }) => {
         {/* Sub-navigation */}
         <aside className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button onClick={() => showTab('welcome')} className={`sub-nav-btn ${activeTab === 'welcome' ? 'active' : ''}`}>
-            <LogIn size={20} /> Home
+            <LogIn size={20} /> {t.nav.home}
           </button>
-          <button onClick={() => showTab('dashboard')} className={`sub-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`} disabled={!currentPatient}>
-            <LayoutDashboard size={20} /> Dashboard
+          <button onClick={() => showTab('dashboard')} className={`sub-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}>
+            <LayoutDashboard size={20} /> {t.nav.dashboard}
           </button>
           <button onClick={() => showTab('register')} className={`sub-nav-btn ${activeTab === 'register' ? 'active' : ''}`}>
-             <User size={20} /> Registration
+             <User size={20} /> {t.nav.registration}
           </button>
-          <button onClick={() => showTab('symptom')} className={`sub-nav-btn ${activeTab === 'symptom' ? 'active' : ''}`} disabled={!currentPatient}>
-            <Activity size={20} /> AI Predictor
+          <button onClick={() => showTab('symptom')} className={`sub-nav-btn ${activeTab === 'symptom' ? 'active' : ''}`}>
+            <Activity size={20} /> {t.nav.aiPredictor}
           </button>
           <button onClick={() => showTab('medicines')} className={`sub-nav-btn ${activeTab === 'medicines' ? 'active' : ''}`}>
-            <Pill size={20} /> Medicines
+            <Pill size={20} /> {t.nav.medicines}
           </button>
-          <button onClick={() => showTab('consultation')} className={`sub-nav-btn ${activeTab === 'consultation' ? 'active' : ''}`} disabled={!currentPatient}>
-            <Video size={20} /> Video Call
+          <button onClick={() => showTab('consultation')} className={`sub-nav-btn ${activeTab === 'consultation' ? 'active' : ''}`}>
+            <Video size={20} /> {t.nav.videoCall}
           </button>
-          <button onClick={() => showTab('consult-request')} className={`sub-nav-btn ${activeTab === 'consult-request' ? 'active' : ''}`} disabled={!currentPatient}>
-            <MessageSquare size={20} /> Request Doctor
+          <button onClick={() => showTab('consult-request')} className={`sub-nav-btn ${activeTab === 'consult-request' ? 'active' : ''}`}>
+            <MessageSquare size={20} /> {t.nav.requestDoctor}
           </button>
         </aside>
 
@@ -230,7 +271,7 @@ const RuralHealthConnect = ({ authUser }) => {
           
           {activeTab === 'register' && (
             <div className="glass-card" style={{ padding: '40px' }}>
-              <h2 style={{ marginBottom: '30px' }}>Patient Registration</h2>
+              <h2 style={{ marginBottom: '30px' }}>{t.registration.title}</h2>
               <form onSubmit={handleRegistration} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                 <div className="form-group">
                   <label>Aadhaar Number</label>
@@ -259,11 +300,11 @@ const RuralHealthConnect = ({ authUser }) => {
             </div>
           )}
 
-          {activeTab === 'dashboard' && currentPatient && (
+          {activeTab === 'dashboard' && (!currentPatient ? <AccessRestricted featureName={t.nav.dashboard} /> : (
             <div style={{ display: 'grid', gap: '24px' }}>
               <div className="glass-card" style={{ padding: '30px', background: 'linear-gradient(to right, rgba(14, 165, 233, 0.1), transparent)' }}>
-                <h2>Welcome back, {authUser.email}!</h2>
-                <p style={{ opacity: 0.7 }}>Your health status is looking stable today. You have one upcoming appointment.</p>
+                <h2>{t.dashboard.welcome.replace('{name}', authUser.email)}</h2>
+                <p style={{ opacity: 0.7 }}>{t.dashboard.status}</p>
               </div>
 
               {/* AI Predictor Quick Access */}
@@ -279,8 +320,8 @@ const RuralHealthConnect = ({ authUser }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <Brain size={28} color="#6366f1" />
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>AI Health Check</h3>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', opacity: 0.7 }}>Get instant symptom analysis with our AI predictor</p>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{t.dashboard.aiHealthCheck}</h3>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', opacity: 0.7 }}>{t.dashboard.aiDesc}</p>
                   </div>
                 </div>
                 <button 
@@ -296,7 +337,7 @@ const RuralHealthConnect = ({ authUser }) => {
                     boxShadow: '0 4px 15px rgba(99, 102, 241, 0.3)'
                   }}
                 >
-                  Analyze Now
+                  {t.dashboard.analyzeNow}
                 </button>
               </div>
 
@@ -313,8 +354,8 @@ const RuralHealthConnect = ({ authUser }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <Video size={28} color="#10b981" />
                   <div>
-                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Telemedicine Consultation</h3>
-                    <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', opacity: 0.7 }}>Connect instantly with available doctors via video</p>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>{t.dashboard.telemedicine}</h3>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', opacity: 0.7 }}>{t.dashboard.teleDesc}</p>
                   </div>
                 </div>
                 <button 
@@ -330,7 +371,7 @@ const RuralHealthConnect = ({ authUser }) => {
                     boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
                   }}
                 >
-                  Start Call
+                  {t.dashboard.startCall}
                 </button>
               </div>
               
@@ -382,27 +423,50 @@ const RuralHealthConnect = ({ authUser }) => {
                 <MedicineAvailability />
               </div>
             </div>
-          )}
+          ))}
 
-          {activeTab === 'symptom' && <AISymptomPredictor />}
+          {activeTab === 'symptom' && (!currentPatient ? <AccessRestricted featureName="AI Health Predictor" /> : <AISymptomPredictor />)}
           
           {activeTab === 'medicines' && <MedicineAvailability />}
           
-          {activeTab === 'consultation' && (
+          {activeTab === 'consultation' && (!currentPatient ? <AccessRestricted featureName="Telemedicine Video Call" /> : (
             <div style={{ display: 'grid', gap: '24px' }}>
                {!consultationActive ? (
                  <div style={{ display: 'grid', gap: '24px' }}>
                    <div className="glass-card" style={{ padding: '60px', textAlign: 'center' }}>
-                      <div style={{ width: 80, height: 80, background: 'linear-gradient(135deg, #10b981, #06b6d4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-                        <Video size={44} color="#fff" />
-                      </div>
-                      <h2 style={{ fontSize: '1.8rem', marginBottom: '16px' }}>Start Video Consultation</h2>
-                      <p style={{ opacity: 0.7, maxWidth: '500px', margin: '0 auto 30px', fontSize: '1rem', lineHeight: '1.6' }}>
-                        Connect instantly with our available doctors. Make sure your camera and microphone are ready before starting the call.
-                      </p>
-                      <button onClick={() => setConsultationActive(true)} style={{ padding: '14px 40px', background: 'linear-gradient(135deg, #10b981, #06b6d4)', fontSize: '1rem', fontWeight: '600' }}>
-                        🎥 Start Video Call
-                      </button>
+                      {videoRequest && videoRequest.status === 'pending' ? (
+                        <div style={{ padding: '20px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                          <p style={{ margin: 0, fontWeight: 'bold', color: '#f59e0b' }}>{t.video.pending}</p>
+                          <p style={{ margin: '5px 0 0 0', fontSize: '0.9rem', opacity: 0.7 }}>{t.video.waiting}</p>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            const newRequest = {
+                              id: Date.now(),
+                              patientName: currentPatient.fullName,
+                              age: currentPatient.age,
+                              gender: currentPatient.gender,
+                              email: authUser.email,
+                              phone: currentPatient.mobile,
+                              symptoms: t.video.requestTitle,
+                              urgency: 'medium',
+                              patientId: currentPatient.aadhaar,
+                              submittedAt: new Date().toISOString(),
+                              status: 'pending',
+                              type: 'video'
+                            };
+                            const existing = JSON.parse(localStorage.getItem('consultationRequests') || '[]');
+                            existing.push(newRequest);
+                            localStorage.setItem('consultationRequests', JSON.stringify(existing));
+                            setVideoRequest(newRequest);
+                            alert(t.video.pending);
+                          }} 
+                          style={{ padding: '14px 40px', background: 'linear-gradient(135deg, #10b981, #06b6d4)', fontSize: '1rem', fontWeight: '600' }}
+                        >
+                          {t.video.btn}
+                        </button>
+                      )}
                    </div>
 
                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
@@ -441,9 +505,9 @@ const RuralHealthConnect = ({ authUser }) => {
                  <VideoCall roomName={`RHC-${currentPatient?.aadhaar.substr(-4)}`} onEndCall={() => setConsultationActive(false)} />
                )}
             </div>
-          )}
+          ))}
 
-          {activeTab === 'consult-request' && currentPatient && (
+          {activeTab === 'consult-request' && (!currentPatient ? <AccessRestricted featureName="Doctor Consultation Request" /> : (
             <ConsultationRequest 
               authUser={{ 
                 id: currentPatient.aadhaar, 
@@ -451,7 +515,7 @@ const RuralHealthConnect = ({ authUser }) => {
                 name: currentPatient.fullName 
               }} 
             />
-          )}
+          ))}
         </div>
       </div>
 

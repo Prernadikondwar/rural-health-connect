@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Shield, User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Shield, User, Mail, Lock, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
+import { LanguageContext } from './App';
 
 const Login = ({ onLoginSuccess }) => {
+  const { lang, t, toggleLang } = useContext(LanguageContext);
   const [userType, setUserType] = useState(null);
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('');
@@ -161,6 +163,14 @@ const Login = ({ onLoginSuccess }) => {
         background: 'radial-gradient(circle at top right, #1e293b, #0f172a)',
         padding: '20px'
       }}>
+        <div style={{ position: 'fixed', top: '20px', right: '20px' }}>
+          <button 
+            onClick={toggleLang}
+            style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '600' }}
+          >
+            <Globe size={18} /> {lang === 'en' ? 'मराठी' : 'English'}
+          </button>
+        </div>
         <div className="glass-card" style={{ maxWidth: '600px', width: '100%', padding: '60px 40px', textAlign: 'center' }}>
           <div style={{ marginBottom: '40px' }}>
             <div style={{
@@ -176,12 +186,12 @@ const Login = ({ onLoginSuccess }) => {
             }}>
               <Shield size={44} color="#fff" />
             </div>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '12px' }}>Rural Health Connect</h1>
-            <p style={{ fontSize: '1rem', opacity: 0.7, margin: 0 }}>Secure Portal Access</p>
+            <h1 style={{ fontSize: '2.5rem', marginBottom: '12px' }}>{t.title}</h1>
+            <p style={{ fontSize: '1rem', opacity: 0.7, margin: 0 }}>{t.login.subtitle}</p>
           </div>
 
           <p style={{ fontSize: '1.05rem', marginBottom: '40px', opacity: 0.8 }}>
-            Welcome! Please select your role to continue.
+            {t.login.selectRole}
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -200,19 +210,11 @@ const Login = ({ onLoginSuccess }) => {
                 alignItems: 'center',
                 gap: '12px'
               }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'linear-gradient(135deg, rgba(10, 180, 180, 0.2), rgba(14, 165, 233, 0.2))';
-                e.target.style.border = '2px solid rgba(10, 180, 180, 0.6)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'linear-gradient(135deg, rgba(10, 180, 180, 0.1), rgba(14, 165, 233, 0.1))';
-                e.target.style.border = '2px solid rgba(10, 180, 180, 0.3)';
-              }}
             >
               <User size={40} color="#06b6d4" />
               <div>
-                <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.2rem' }}>Patient</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>Access your health records</p>
+                <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.2rem' }}>{t.login.patient}</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>{t.login.patientDesc}</p>
               </div>
             </button>
 
@@ -231,28 +233,20 @@ const Login = ({ onLoginSuccess }) => {
                 alignItems: 'center',
                 gap: '12px'
               }}
-              onMouseEnter={(e) => {
-                e.target.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(34, 197, 94, 0.2))';
-                e.target.style.border = '2px solid rgba(16, 185, 129, 0.6)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(34, 197, 94, 0.1))';
-                e.target.style.border = '2px solid rgba(16, 185, 129, 0.3)';
-              }}
             >
               <Shield size={40} color="#10b981" />
               <div>
-                <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.2rem' }}>Doctor</h3>
-                <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>Manage consultations</p>
+                <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.2rem' }}>{t.login.doctor}</h3>
+                <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.7 }}>{t.login.doctorDesc}</p>
               </div>
             </button>
           </div>
 
           <div style={{ marginTop: '40px', padding: '20px', background: 'rgba(99, 102, 241, 0.15)', borderRadius: '8px', textAlign: 'left', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
-            <p style={{ margin: '0 0 10px 0', fontWeight: '700', fontSize: '0.95rem', color: '#ffffff' }}>� Getting Started:</p>
-            <p style={{ margin: '6px 0', fontSize: '0.9rem', color: '#e0e7ff' }}>No account yet? Click the button below to <strong>Create Account</strong></p>
-            <p style={{ margin: '6px 0', fontSize: '0.9rem', color: '#e0e7ff' }}>Then fill in your details and start using Rural Health Connect</p>
-            <p style={{ margin: '8px 0 0 0', fontSize: '0.85rem', color: '#c7d2fe' }}>New users: Select your role → <strong style={{ color: '#60a5fa' }}>✏️ Create Account</strong></p>
+            <p style={{ margin: '0 0 10px 0', fontWeight: '700', fontSize: '0.95rem', color: '#ffffff' }}> {t.login.gettingStarted}</p>
+            <p style={{ margin: '6px 0', fontSize: '0.9rem', color: '#e0e7ff' }}>{t.login.noAccount.replace('**', '')}</p>
+            <p style={{ margin: '6px 0', fontSize: '0.9rem', color: '#e0e7ff' }}>{t.login.thenFill}</p>
+            <p style={{ margin: '8px 0 0 0', fontSize: '0.85rem', color: '#c7d2fe' }}>{t.login.newUser}</p>
           </div>
         </div>
       </div>
@@ -284,7 +278,7 @@ const Login = ({ onLoginSuccess }) => {
           onMouseEnter={(e) => e.target.style.color = '#93c5fd'}
           onMouseLeave={(e) => e.target.style.color = '#60a5fa'}
         >
-          ← Back to Role Selection
+          ← {t.login.backRole}
         </button>
 
         <div style={{ marginBottom: '30px', textAlign: 'center' }}>
@@ -302,12 +296,12 @@ const Login = ({ onLoginSuccess }) => {
             {userType === 'patient' ? <User size={32} color="#fff" /> : <Shield size={32} color="#fff" />}
           </div>
           <h2 style={{ margin: '0 0 8px 0', fontSize: '1.5rem', color: '#ffffff' }}>
-            {isRegister ? 'Create Account' : 'Login'}
+            {isRegister ? t.login.createAccount : t.login.loginBtn}
           </h2>
           <p style={{ margin: 0, color: '#c7d2fe', fontSize: '0.9rem' }}>
             {isRegister 
-              ? `Register as ${userType === 'patient' ? 'a patient' : 'a doctor'}`
-              : `Sign in to your ${userType} account`
+              ? t.login.registerAs.replace('{role}', userType === 'patient' ? t.login.patient : t.login.doctor)
+              : t.login.signIn.replace('{role}', userType === 'patient' ? t.login.patient : t.login.doctor)
             }
           </p>
         </div>
@@ -328,7 +322,7 @@ const Login = ({ onLoginSuccess }) => {
 
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: '#ffffff' }}>
-            Email Address
+            {t.login.email}
           </label>
           <div style={{ position: 'relative' }}>
             <Mail style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9', zIndex: 2 }} size={18} />
@@ -353,7 +347,7 @@ const Login = ({ onLoginSuccess }) => {
 
         <div style={{ marginBottom: isRegister ? '20px' : '24px' }}>
           <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: '#ffffff' }}>
-            Password
+            {t.login.password}
           </label>
           <div style={{ position: 'relative' }}>
             <Lock style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9', zIndex: 2 }} size={18} />
@@ -395,7 +389,7 @@ const Login = ({ onLoginSuccess }) => {
         {isRegister && (
           <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', fontWeight: '600', color: '#ffffff' }}>
-              Confirm Password
+              {t.login.confirmPassword}
             </label>
             <div style={{ position: 'relative' }}>
               <Lock style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#0ea5e9', zIndex: 2 }} size={18} />
@@ -442,12 +436,13 @@ const Login = ({ onLoginSuccess }) => {
             gap: '8px'
           }}
         >
-          {loading ? '🔄 Processing...' : isRegister ? '📝 Create Account' : '🔓 Login'}
+          {loading ? t.login.processing : isRegister ? `📝 ${t.login.createAccount}` : `🔓 ${t.login.loginBtn}`}
         </button>
 
         <button
           onClick={() => { setIsRegister(!isRegister); setError(''); setConfirmPassword(''); }}
           style={{
+             // ... existing styles ...
             width: '100%',
             padding: '14px',
             background: isRegister 
@@ -472,28 +467,8 @@ const Login = ({ onLoginSuccess }) => {
               : '0 8px 20px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
             textShadow: isRegister ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.2)'
           }}
-          onMouseEnter={(e) => {
-            if (!isRegister) {
-              e.target.style.background = 'linear-gradient(135deg, #60a5fa, #93c5fd)';
-              e.target.style.boxShadow = '0 12px 30px rgba(59, 130, 246, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-              e.target.style.transform = 'translateY(-2px)';
-            } else {
-              e.target.style.background = 'rgba(59, 130, 246, 0.2)';
-              e.target.style.borderColor = 'rgba(59, 130, 246, 0.6)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isRegister) {
-              e.target.style.background = 'linear-gradient(135deg, #3b82f6, #60a5fa)';
-              e.target.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)';
-              e.target.style.transform = 'translateY(0)';
-            } else {
-              e.target.style.background = 'rgba(59, 130, 246, 0.1)';
-              e.target.style.borderColor = 'rgba(59, 130, 246, 0.3)';
-            }
-          }}
         >
-          {isRegister ? '🔓 Back to Login' : '✏️ Create Account'}
+          {isRegister ? `🔓 ${t.login.backToLogin}` : `✏️ ${t.login.createAccount}`}
           <ArrowRight size={isRegister ? 16 : 20} />
         </button>
 

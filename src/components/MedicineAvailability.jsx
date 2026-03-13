@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Pill, Check, X, RefreshCw } from 'lucide-react';
+import { LanguageContext } from '../App';
 
 const MedicineAvailability = () => {
+  const { t } = useContext(LanguageContext);
   const medicines = [
     { name: 'Paracetamol 650mg', status: 'In Stock', stock: '500+ units', location: 'Main Pharmacy' },
     { name: 'Amoxicillin 500mg', status: 'Low Stock', stock: '45 units', location: 'Main Pharmacy' },
@@ -16,10 +18,10 @@ const MedicineAvailability = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Pill size={24} color="var(--primary)" />
-          <h2 style={{ margin: 0 }}>Medicine Availability</h2>
+          <h2 style={{ margin: 0 }}>{t.nav.medicines}</h2>
         </div>
         <button className="btn-icon" style={{ padding: '8px', background: 'transparent', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <RefreshCw size={16} /> <span style={{ fontSize: '0.8rem' }}>Update</span>
+          <RefreshCw size={16} /> <span style={{ fontSize: '0.8rem' }}>{t.dashboard.updateBtn || 'Update'}</span>
         </button>
       </div>
 
@@ -48,7 +50,7 @@ const MedicineAvailability = () => {
                 fontWeight: '600'
               }}>
                 {med.status === 'In Stock' ? <Check size={16} /> : med.status === 'Low Stock' ? <RefreshCw size={16} /> : <X size={16} />}
-                {med.status}
+                {t.stock[med.status] || med.status}
               </div>
               <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>{med.stock}</div>
             </div>
@@ -58,7 +60,7 @@ const MedicineAvailability = () => {
       
       <div style={{ marginTop: '20px', padding: '12px', backgroundColor: 'rgba(14, 165, 233, 0.1)', borderRadius: '8px', fontSize: '0.85rem' }}>
         <p style={{ margin: 0, color: 'var(--primary)' }}>
-          <strong>Note:</strong> Stock levels are updated every 6 hours by the Primary Health Center staff.
+          <strong>{t.stock.notePrefix}:</strong> {t.stock.note}
         </p>
       </div>
     </div>

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { AlertTriangle, CheckCircle, Zap, Brain } from 'lucide-react';
+import { LanguageContext } from '../App';
 
 const AISymptomPredictor = () => {
+  const { lang, t } = useContext(LanguageContext);
   const [symptoms, setSymptoms] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [prediction, setPrediction] = useState(null);
@@ -83,11 +85,11 @@ const AISymptomPredictor = () => {
       <div className="glass-card" style={{ padding: '24px', borderRadius: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
           <Brain size={32} color="var(--primary)" />
-          <h2 style={{ margin: 0, fontSize: '1.5rem' }}>AI Symptom Predictor</h2>
+          <h2 style={{ margin: 0, fontSize: '1.5rem' }}>{t.symptom.title}</h2>
         </div>
 
         <p style={{ marginBottom: '20px', color: '#94a3b8', fontSize: '0.95rem' }}>
-          Select symptoms or describe them below for analysis:
+          {t.symptom.desc}
         </p>
 
         {/* Symptom Buttons */}
@@ -110,7 +112,7 @@ const AISymptomPredictor = () => {
                   transition: 'all 0.2s ease'
                 }}
               >
-                {symptom}
+                {t.symptom.common[symptom] || symptom}
               </button>
             ))}
           </div>
@@ -118,7 +120,7 @@ const AISymptomPredictor = () => {
 
         {/* Text Input */}
         <textarea
-          placeholder="Describe additional symptoms..."
+          placeholder={t.symptom.placeholder}
           value={symptoms}
           onChange={(e) => setSymptoms(e.target.value)}
           style={{
@@ -153,7 +155,7 @@ const AISymptomPredictor = () => {
             transition: 'all 0.2s ease'
           }}
         >
-          {loading ? '🔄 Analyzing...' : '🚀 Analyze Now'}
+          {loading ? t.symptom.processing : t.symptom.btn}
         </button>
       </div>
 
@@ -174,8 +176,8 @@ const AISymptomPredictor = () => {
               <CheckCircle size={32} color={getRiskColor(prediction.risk)} />
             )}
             <div>
-              <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Analysis Result</h3>
-              <p style={{ margin: 0, opacity: 0.8 }}>{prediction.condition}</p>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>{t.symptom.result}</h3>
+              <p style={{ margin: 0, opacity: 0.8 }}>{lang === 'mr' ? 'तपासणीनंतर प्राप्त झालेली स्थिती' : prediction.condition}</p>
             </div>
             <span style={{
               marginLeft: 'auto',
@@ -186,7 +188,7 @@ const AISymptomPredictor = () => {
               fontWeight: 'bold',
               fontSize: '0.85rem'
             }}>
-              {prediction.risk} Risk
+              {prediction.risk} {t.symptom.risk}
             </span>
           </div>
 
@@ -196,7 +198,7 @@ const AISymptomPredictor = () => {
             borderRadius: '8px',
             borderLeft: `3px solid ${getRiskColor(prediction.risk)}`
           }}>
-            <strong>Recommendation:</strong><br/>
+            <strong>{t.symptom.recommendation}:</strong><br/>
             {prediction.advice}
           </div>
 
@@ -217,7 +219,7 @@ const AISymptomPredictor = () => {
               fontWeight: '500'
             }}
           >
-            New Analysis
+            {t.symptom.new}
           </button>
         </div>
       )}

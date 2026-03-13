@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Shield, User, Activity, Video, ClipboardList, Database, LogOut, Search, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Shield, User, Activity, Video, ClipboardList, Database, LogOut, Search, MessageSquare, CheckCircle, XCircle, Globe } from 'lucide-react';
+import { LanguageContext } from './App';
 import VideoCall from './components/VideoCall';
 import './doctor_portal.css';
 
 const DoctorPortal = ({ authUser }) => {
+  const { lang, t, toggleLang } = useContext(LanguageContext);
   const [activeTab, setActiveTab] = useState('requests');
   const [consultationActive, setConsultationActive] = useState(false);
   const [consultationRequests, setConsultationRequests] = useState([]);
@@ -31,68 +33,61 @@ const DoctorPortal = ({ authUser }) => {
   }, []);
 
   useEffect(() => {
+    const fetchRequests = () => {
+      const existingRequests = localStorage.getItem('consultationRequests');
+      if (existingRequests) {
+         const requests = JSON.parse(existingRequests);
+         const pendingRequests = requests.filter(req => req.status === 'pending');
+         setConsultationRequests(pendingRequests);
+      } else {
+         setConsultationRequests([]);
+      }
+    };
+
     // Load real consultation requests submitted by users from localStorage
     const existingRequests = localStorage.getItem('consultationRequests');
-    if (!existingRequests || JSON.parse(existingRequests).length === 0) {
-      // Initialize demo requests if none exist
-      const demoRequests = [
-        {
-          id: Date.now(),
-          patientName: 'Ravi Kumar',
-          age: '45',
-          gender: 'male',
-          email: 'ravi.kumar@example.com',
-          phone: '+91-98765-43210',
-          symptoms: 'High fever (101°F) for 3 days, severe headache, body aches, and loss of appetite. Unable to sleep properly.',
-          medicalHistory: 'Mild hypertension, regular reader',
-          urgency: 'high',
-          preferredTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16),
-          patientId: 'PAT001',
-          submittedAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-          status: 'pending',
-          doctorResponse: null
-        },
-        {
-          id: Date.now() + 1,
-          patientName: 'Priya Sharma',
-          age: '32',
-          gender: 'female',
-          email: 'priya.sharma@example.com',
-          phone: '+91-97654-32109',
-          symptoms: 'Persistent cough for 2 weeks, mild chest discomfort while breathing, fatigue. Dry cough, no phlegm.',
-          medicalHistory: 'Asthma since childhood, takes inhalers occasionally',
-          urgency: 'medium',
-          preferredTime: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 16),
-          patientId: 'PAT002',
-          submittedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-          status: 'pending',
-          doctorResponse: null
-        },
-        {
-          id: Date.now() + 2,
-          patientName: 'Ramesh Patel',
-          age: '58',
-          gender: 'male',
-          email: 'ramesh.patel@example.com',
-          phone: '+91-96543-21098',
-          symptoms: 'Chronic back pain, affecting daily work, pain radiates to left leg. Difficulty sitting for long hours.',
-          medicalHistory: 'No major illnesses, works as farmer, occasional stress-related issues',
-          urgency: 'low',
-          preferredTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
-          patientId: 'PAT003',
-          submittedAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-          status: 'pending',
-          doctorResponse: null
-        }
-      ];
-      localStorage.setItem('consultationRequests', JSON.stringify(demoRequests));
-      setConsultationRequests(demoRequests);
+    if (!existingRequests) {
+      localStorage.setItem('consultationRequests', JSON.stringify([]));
+      setConsultationRequests([]);
     } else {
-      const requests = JSON.parse(existingRequests);
-      // Filter only pending requests
-      const pendingRequests = requests.filter(req => req.status === 'pending');
-      setConsultationRequests(pendingRequests);
+      fetchRequests();
     }
+
+    // Adaptive polling: slower when tab is hidden
+    let pollInterval = 5000;
+    let timerID;
+
+    const startPolling = () => {
+      timerID = setInterval(fetchRequests, pollInterval);
+    };
+
+    const handleVisibilityChange = () => {
+      clearInterval(timerID);
+      if (document.hidden) {
+        pollInterval = 15000; // slow down to 15s when inactive
+      } else {
+        pollInterval = 5000; // back to 5s when active
+        fetchRequests();
+      }
+      startPolling();
+    };
+
+    startPolling();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Listen for storage changes from other tabs
+    const handleStorageChange = (e) => {
+      if (e.key === 'consultationRequests') {
+        fetchRequests();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      clearInterval(timerID);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleAcceptRequest = (requestId) => {
@@ -136,10 +131,16 @@ const DoctorPortal = ({ authUser }) => {
           <Shield color="var(--primary)" size={32} />
           <div>
             <h1 style={{ fontSize: '1.4rem', margin: 0 }}>{authUser.email}</h1>
-            <p style={{ fontSize: '0.8rem', opacity: 0.5, margin: 0 }}>Medical Officer | Doctor Portal</p>
+            <p style={{ fontSize: '0.8rem', opacity: 0.5, margin: 0 }}>{t.login.doctor} | {t.title} Portal</p>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+           <button 
+             onClick={toggleLang}
+             style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem' }}
+           >
+             <Globe size={16} /> {lang === 'en' ? 'मराठी' : 'English'}
+           </button>
            <div style={{ textAlign: 'right' }}>
               <div style={{ color: '#10b981', fontWeight: 'bold' }}>● Online</div>
               <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{consultationRequests.length} pending {consultationRequests.length === 1 ? 'consultation' : 'consultations'}</div>
@@ -243,7 +244,7 @@ const DoctorPortal = ({ authUser }) => {
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                               <h3 style={{ margin: 0, fontSize: '1.2rem' }}>{request.patientName}</h3>
-                              <span style={{
+                               <span style={{
                                 background: request.urgency === 'high' ? '#ef4444' : request.urgency === 'medium' ? '#f59e0b' : '#10b981',
                                 color: '#fff',
                                 padding: '4px 10px',
@@ -252,7 +253,7 @@ const DoctorPortal = ({ authUser }) => {
                                 fontWeight: 'bold',
                                 textTransform: 'uppercase'
                               }}>
-                                {request.urgency} Priority
+                                {request.type === 'video' ? '📹 Video Call' : '📋 Routine'} | {request.urgency} Priority
                               </span>
                             </div>
 
