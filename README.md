@@ -192,4 +192,4 @@ For support or questions, please contact the development team or create an issue
 
 ---
 
-**Built with ❤️ for Rural Healthcare**
+**Built with ❤️ for Rural Healthcare by Prerna Dikondwar**
