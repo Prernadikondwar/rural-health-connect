@@ -75,45 +75,8 @@ A digital healthcare ecosystem designed for rural areas, built as a **multi-port
 5. **Open your browser**
    - Navigate to `http://localhost:5173` (or the port shown in terminal)
 
----
 
-## 📜 Available Scripts
 
-In the project directory, you can run:
-
-- **`npm run dev`** - Runs the app in development mode
-- **`npm run build`** - Builds the app for production
-- **`npm run preview`** - Preview the production build locally
-- **`npm run lint`** - Run ESLint for code quality checks
-
----
-
-## 🏗️ Architecture
-
-The application follows a **component-based architecture** with three main portal components:
-
-- **`App.jsx`** - Main application component with routing logic
-- **`rural_health_connect.jsx`** - Patient Portal component
-- **`phc_hub.jsx`** - PHC Hub management component  
-- **`doctor_portal.jsx`** - Doctor consultation component
-- **`nodejs_to_mongodb.js`** - Database integration layer
-
-Each portal maintains its own state and styling, while sharing common utilities and database connections.
-
----
-
-## 🔧 Configuration
-
-### Vite Configuration
-The project uses Vite for fast development and building. Configuration can be found in `vite.config.js`.
-
-### ESLint Configuration  
-Code quality is maintained using ESLint. Settings are in `eslint.config.js`.
-
-### Database Configuration
-MongoDB connection settings can be modified in `src/nodejs_to_mongodb.js`.
-
----
 
 ## 🌟 Key React Features Used
 
@@ -127,38 +90,6 @@ MongoDB connection settings can be modified in `src/nodejs_to_mongodb.js`.
 
 ---
 
-## 🚀 Deployment
 
-To build for production:
-
-```bash
-npm run build
-```
-
-The build files will be generated in the `dist/` directory, ready for deployment to any static hosting service.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/new-feature`)
-3. Commit your changes (`git commit -am 'Add new feature'`)
-4. Push to the branch (`git push origin feature/new-feature`)
-5. Create a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 📞 Support
-
-For support or questions, please contact the development team or create an issue in the repository.
-
----
 
 **Built with ❤️ for Rural Healthcare by Prerna Dikondwar**
