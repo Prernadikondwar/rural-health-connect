@@ -35,39 +35,8 @@ A digital healthcare ecosystem designed for rural areas, built as a **multi-port
 - **Styling:** CSS Modules / Custom CSS with responsive design  
 - **State Management:** React Hooks (useState, useEffect)
 - **Database:** MongoDB integration for data persistence
-- **Concepts Used:** Component-based architecture, React Router, form handling, state management, mock AI analysis  
-
----
-
-## 📂 Folder Structure
-
-```
-RURAL_HEALTH_CONNECT/
-├── node_modules/              # Dependencies
-├── public/                    # Static assets
-├── src/                       # Source code
-│   ├── assets/               # Images, icons, static files
-│   ├── App.css               # Main app styling
-│   ├── App.jsx               # Main app component
-│   ├── doctor_portal.css     # Doctor portal styles
-│   ├── doctor_portal.jsx     # Doctor portal component
-│   ├── index.css             # Global styles
-│   ├── main.jsx              # App entry point
-│   ├── nodejs_to_mongodb.js  # Database connection
-│   ├── phc_hub.css           # PHC Hub styles
-│   ├── phc_hub.jsx           # PHC Hub component
-│   ├── rural_health_connect.css # Patient portal styles
-│   ├── rural_health_connect.jsx # Patient portal component
-│   └── test.css              # Test styles
-├── .gitignore                # Git ignore rules
-├── eslint.config.js          # ESLint configuration
-├── index.html                # HTML template
-├── package-lock.json         # Dependency lock file
-├── package.json              # Project dependencies & scripts
-├── README.md                 # Project documentation
-└── vite.config.js            # Vite configuration
-```
-
+- **Concepts Used:** Component-based architecture, React Router, form handling, state management, mock AI analysis
+- 
 ---
 
 ## 🚀 Getting Started
